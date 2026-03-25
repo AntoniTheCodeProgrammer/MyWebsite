@@ -86,7 +86,7 @@ body {
 
 
 /* ─── Tab layout (rurikon style) ─── */
-.right-content {
+.side-content {
     text-align: left;
     align-items: flex-start;
 }
