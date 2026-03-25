@@ -29,7 +29,7 @@ body {
 
 /* Header at ~1/5 from top, centered */
 .side-header {
-    padding-top: 20vh;
+    padding-top: 15vh;
     text-align: center;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
@@ -39,10 +39,50 @@ body {
 .side-content {
     flex: 1;
     display: flex;
+    /* flex-direction: column; */
     align-items: center;
     justify-content: center;
     padding: 2rem 2.5rem;
     text-align: center;
+}
+
+/* Custom buttons for left side */
+.btn-group-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 2rem;
+}
+
+.btn-custom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn-custom:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-custom i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
 }
 
 /* Social links styling */
@@ -153,7 +193,7 @@ body {
     line-height: 1.75;
 }
 
-.tab-panel { display: none; animation: fadeIn 0.2s ease; }
+.tab-panel { display: none; animation: fadeIn 1s ease; }
 .tab-panel.active { display: block; }
 
 @keyframes fadeIn {
