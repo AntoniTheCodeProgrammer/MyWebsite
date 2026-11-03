@@ -35,6 +35,8 @@ function Runner(outerContainerId, opt_config) {
     this.distanceMeter = null;
     this.distanceRan = 0;
 
+    this.skillManager = null;
+
     this.highestScore = 0;
 
     this.time = 0;
@@ -357,6 +359,9 @@ Runner.prototype = {
         // Draw t-rex
         this.tRex = new Trex(this.canvas, this.spriteDef.TREX);
 
+        // Skills system
+        this.skillManager = new SkillManager(this);
+
         this.outerContainerEl.appendChild(this.containerEl);
 
         if (IS_MOBILE) {
@@ -535,8 +540,14 @@ Runner.prototype = {
                     this.inverted);
             }
 
+            // Update skills and projectiles
+            if (this.skillManager) {
+                this.skillManager.update(deltaTime);
+            }
+
             // Check for collisions.
             var collision = hasObstacles &&
+                this.horizon.obstacles.length > 0 &&
                 checkForCollision(this.horizon.obstacles[0], this.tRex);
 
             if (!collision) {
@@ -687,6 +698,10 @@ Runner.prototype = {
                 this.tRex.setDuck(true);
             }
         }
+
+        if (this.playing && !this.crashed && this.skillManager) {
+            this.skillManager.handleKeyDown(e);
+        }
     },
 
 
@@ -805,6 +820,7 @@ Runner.prototype = {
             this.runningTime = 0;
             this.playing = true;
             this.crashed = false;
+            this.paused = false;
             this.distanceRan = 0;
             this.setSpeed(this.config.SPEED);
             this.time = getTimeStamp();
@@ -812,7 +828,11 @@ Runner.prototype = {
             this.clearCanvas();
             this.distanceMeter.reset(this.highestScore);
             this.horizon.reset();
+            this.tRex.attacking = false;
             this.tRex.reset();
+            if (this.skillManager) {
+                this.skillManager.reset();
+            }
             this.playSound(this.soundFx.BUTTON_PRESS);
             this.invert(true);
             this.update();

@@ -530,6 +530,17 @@ Horizon.prototype = {
     },
 
     /**
+     * Remove a specific obstacle (e.g. destroyed by projectile).
+     * @param {Obstacle} obstacle
+     */
+    removeObstacle: function (obstacle) {
+        var index = this.obstacles.indexOf(obstacle);
+        if (index !== -1) {
+            this.obstacles.splice(index, 1);
+        }
+    },
+
+    /**
      * Add a new obstacle.
      * @param {number} currentSpeed
      */

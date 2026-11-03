@@ -28,6 +28,10 @@ function CollisionBox(x, y, w, h) {
  * @return {Array<CollisionBox>}
  */
 function checkForCollision(obstacle, tRex, opt_canvasCtx) {
+    if (!obstacle || !tRex) {
+        return false;
+    }
+
     var obstacleBoxXPos = Runner.defaultDimensions.WIDTH + obstacle.xPos;
 
     // Adjustments are made to the bounding box as there is a 1 pixel white

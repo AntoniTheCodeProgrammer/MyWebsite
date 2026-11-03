@@ -28,6 +28,7 @@ function Trex(canvas, spritePos) {
 
     this.jumping = false;
     this.ducking = false;
+    this.attacking = false;
     this.jumpVelocity = 0;
     this.reachedMinHeight = false;
     this.speedDrop = false;
@@ -83,6 +84,7 @@ Trex.collisionBoxes = {
  * @enum {string}
  */
 Trex.status = {
+    ATTACK: 'ATTACK',
     CRASHED: 'CRASHED',
     DUCKING: 'DUCKING',
     JUMPING: 'JUMPING',
@@ -121,6 +123,10 @@ Trex.animFrames = {
     DUCKING: {
         frames: [264, 323],
         msPerFrame: 1000 / 8
+    },
+    ATTACK: {
+        frames: [385, 429],
+        msPerFrame: 1000 / 5
     }
 };
 
@@ -159,6 +165,9 @@ Trex.prototype = {
 
         // Update the status.
         if (opt_status) {
+            if (opt_status == Trex.status.CRASHED || opt_status == Trex.status.WAITING) {
+                this.attacking = false;
+            }
             this.status = opt_status;
             this.currentFrame = 0;
             this.msPerFrame = Trex.animFrames[opt_status].msPerFrame;
@@ -184,9 +193,26 @@ Trex.prototype = {
 
         // Update the frame position.
         if (this.timer >= this.msPerFrame) {
-            this.currentFrame = this.currentFrame ==
-                this.currentAnimFrames.length - 1 ? 0 : this.currentFrame + 1;
-            this.timer = 0;
+            if (this.status == Trex.status.ATTACK) {
+                if (this.currentFrame < this.currentAnimFrames.length - 1) {
+                    this.currentFrame++;
+                    this.timer = 0;
+                } else {
+                    this.attacking = false;
+                    this.timer = 0;
+                    if (this.ducking) {
+                        this.update(0, Trex.status.DUCKING);
+                    } else if (this.jumping) {
+                        this.update(0, Trex.status.JUMPING);
+                    } else {
+                        this.update(0, Trex.status.RUNNING);
+                    }
+                }
+            } else {
+                this.currentFrame = this.currentFrame ==
+                    this.currentAnimFrames.length - 1 ? 0 : this.currentFrame + 1;
+                this.timer = 0;
+            }
         }
 
         // Speed drop becomes duck if the down key is still being pressed.
@@ -202,11 +228,12 @@ Trex.prototype = {
      * @param {number} y
      */
     draw: function (x, y) {
+        var isAttack = this.status == Trex.status.ATTACK;
         var sourceX = x;
-        var sourceY = y;
-        var sourceWidth = this.ducking && this.status != Trex.status.CRASHED ?
+        var sourceY = isAttack ? 0 : y;
+        var sourceWidth = this.ducking && !isAttack && this.status != Trex.status.CRASHED ?
             this.config.WIDTH_DUCK : this.config.WIDTH;
-        var sourceHeight = this.config.HEIGHT;
+        var sourceHeight = isAttack ? (this.config.HEIGHT + 2) : this.config.HEIGHT;
 
         if (IS_HIDPI) {
             sourceX *= 2;
@@ -217,10 +244,16 @@ Trex.prototype = {
 
         // Adjustments for sprite sheet position.
         sourceX += this.spritePos.x;
-        sourceY += this.spritePos.y;
+        sourceY += isAttack ? 0 : this.spritePos.y;
 
-        // Ducking.
-        if (this.ducking && this.status != Trex.status.CRASHED) {
+        // Attack.
+        if (isAttack) {
+            this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
+                sourceWidth, sourceHeight,
+                this.xPos, this.yPos - 2,
+                this.config.WIDTH, this.config.HEIGHT + 2);
+        } else if (this.ducking && this.status != Trex.status.CRASHED) {
+            // Ducking.
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
                 this.xPos, this.yPos,
@@ -270,7 +303,9 @@ Trex.prototype = {
      */
     startJump: function (speed) {
         if (!this.jumping) {
-            this.update(0, Trex.status.JUMPING);
+            if (!this.attacking) {
+                this.update(0, Trex.status.JUMPING);
+            }
             // Tweak the jump velocity based on the speed.
             this.jumpVelocity = this.config.INIITAL_JUMP_VELOCITY - (speed / 10);
             this.jumping = true;
@@ -339,13 +374,28 @@ Trex.prototype = {
      * @param {boolean} isDucking.
      */
     setDuck: function (isDucking) {
-        if (isDucking && this.status != Trex.status.DUCKING) {
-            this.update(0, Trex.status.DUCKING);
+        if (isDucking) {
             this.ducking = true;
-        } else if (this.status == Trex.status.DUCKING) {
-            this.update(0, Trex.status.RUNNING);
+            if (!this.attacking && this.status != Trex.status.DUCKING) {
+                this.update(0, Trex.status.DUCKING);
+            }
+        } else {
             this.ducking = false;
+            if (!this.attacking && this.status == Trex.status.DUCKING) {
+                this.update(0, Trex.status.RUNNING);
+            }
         }
+    },
+
+    /**
+     * Start the attack animation.
+     */
+    startAttack: function () {
+        if (this.status == Trex.status.CRASHED || this.status == Trex.status.WAITING) {
+            return;
+        }
+        this.attacking = true;
+        this.update(0, Trex.status.ATTACK);
     },
 
     /**
@@ -356,9 +406,12 @@ Trex.prototype = {
         this.jumpVelocity = 0;
         this.jumping = false;
         this.ducking = false;
-        this.update(0, Trex.status.RUNNING);
         this.midair = false;
         this.speedDrop = false;
         this.jumpCount = 0;
+        if (this.attacking) {
+            return;
+        }
+        this.update(0, Trex.status.RUNNING);
     }
 };
