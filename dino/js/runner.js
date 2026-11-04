@@ -24,6 +24,9 @@ function Runner(outerContainerId, opt_config) {
     this.detailsButton = this.outerContainerEl.querySelector('#details-button');
 
     this.config = opt_config || Runner.config;
+    if (typeof window !== 'undefined' && typeof window.ENABLE_INTRO !== 'undefined') {
+        this.config.ENABLE_INTRO = window.ENABLE_INTRO;
+    }
 
     this.dimensions = Runner.defaultDimensions;
 
@@ -81,6 +84,13 @@ window['Runner'] = Runner;
  * @enum {number}
  */
 Runner.config = {
+    // =========================================================================
+    // TRYB INTRO:
+    // true  -> Oryginalne intro 1:1 z Chrome (Dino w 44px, animacja rozwijania planszy z lewej do prawej)
+    // false -> Bez intro (pełna plansza i podłoga od razu na pełnej szerokości)
+    // =========================================================================
+    ENABLE_INTRO: true,
+
     ACCELERATION: 0.001,
     BG_CLOUD_SPEED: 0.2,
     BOTTOM_PAD: 10,
@@ -364,6 +374,19 @@ Runner.prototype = {
 
         this.outerContainerEl.appendChild(this.containerEl);
 
+        // Ustawienie początkowej szerokości kontenera pod intro jeśli włączone
+        if (this.config.ENABLE_INTRO) {
+            this.containerEl.style.width = Trex.config.WIDTH + 'px';
+            this.containerEl.style.left = '0';
+            this.containerEl.style.right = 'auto';
+            this.containerEl.style.margin = '0';
+        } else {
+            this.containerEl.style.width = this.dimensions.WIDTH + 'px';
+            this.containerEl.style.left = '0';
+            this.containerEl.style.right = '0';
+            this.containerEl.style.margin = '0 auto';
+        }
+
         if (IS_MOBILE) {
             this.createTouchController();
         }
@@ -447,11 +470,24 @@ Runner.prototype = {
      */
     playIntro: function () {
         if (!this.activated && !this.crashed) {
+            if (!this.config.ENABLE_INTRO) {
+                this.playingIntro = false;
+                this.tRex.playingIntro = false;
+                this.playing = true;
+                this.activated = true;
+                this.startGame();
+                return;
+            }
+
             this.playingIntro = true;
             this.tRex.playingIntro = true;
 
             // CSS animation definition.
             var keyframes = '@-webkit-keyframes intro { ' +
+                'from { width:' + Trex.config.WIDTH + 'px }' +
+                'to { width: ' + this.dimensions.WIDTH + 'px }' +
+                '} ' +
+                '@keyframes intro { ' +
                 'from { width:' + Trex.config.WIDTH + 'px }' +
                 'to { width: ' + this.dimensions.WIDTH + 'px }' +
                 '}';
@@ -464,13 +500,13 @@ Runner.prototype = {
 
             this.containerEl.addEventListener(Runner.events.ANIM_END,
                 this.startGame.bind(this));
+            this.containerEl.addEventListener('animationend',
+                this.startGame.bind(this));
 
             this.containerEl.style.webkitAnimation = 'intro .4s ease-out 1 both';
+            this.containerEl.style.animation = 'intro .4s ease-out 1 both';
             this.containerEl.style.width = this.dimensions.WIDTH + 'px';
 
-            // if (this.touchController) {
-            //     this.outerContainerEl.appendChild(this.touchController);
-            // }
             this.playing = true;
             this.activated = true;
         } else if (this.crashed) {
@@ -486,8 +522,12 @@ Runner.prototype = {
         this.setArcadeMode();
         this.runningTime = 0;
         this.playingIntro = false;
-        this.tRex.playingIntro = false;
         this.containerEl.style.webkitAnimation = '';
+        this.containerEl.style.animation = '';
+        this.containerEl.style.width = this.dimensions.WIDTH + 'px';
+        this.containerEl.style.left = '';
+        this.containerEl.style.right = '';
+        this.containerEl.style.margin = '';
         this.playCount++;
 
         // Handle tabbing off the page. Pause the current game.
@@ -670,6 +710,10 @@ Runner.prototype = {
                 if (!this.playing) {
                     this.loadSounds();
                     this.playing = true;
+                    if (!this.config.ENABLE_INTRO) {
+                        this.activated = true;
+                        this.startGame();
+                    }
                     this.update();
                     if (window.errorPageController) {
                         errorPageController.trackEasterEgg();
@@ -830,6 +874,8 @@ Runner.prototype = {
             this.horizon.reset();
             this.tRex.attacking = false;
             this.tRex.reset();
+            this.tRex.xPos = Trex.config.START_X_POS;
+            this.tRex.playingIntro = false;
             if (this.skillManager) {
                 this.skillManager.reset();
             }

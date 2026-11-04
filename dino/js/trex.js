@@ -11,7 +11,8 @@ function Trex(canvas, spritePos) {
     this.canvas = canvas;
     this.canvasCtx = canvas.getContext('2d');
     this.spritePos = spritePos;
-    this.xPos = 0;
+    var hasIntro = typeof Runner !== 'undefined' && Runner.config && Runner.config.ENABLE_INTRO;
+    this.xPos = hasIntro ? 0 : Trex.config.START_X_POS;
     this.yPos = 0;
     // Position when on the ground.
     this.groundYPos = 0;
@@ -50,11 +51,11 @@ Trex.config = {
     HEIGHT_DUCK: 25,
     INIITAL_JUMP_VELOCITY: -10,
     INTRO_DURATION: 1500,
-    MAX_JUMP_HEIGHT: 30,
+    MAX_JUMP_HEIGHT: 30, 
     MIN_JUMP_HEIGHT: 30,
     SPEED_DROP_COEFFICIENT: 3,
     SPRITE_WIDTH: 262,
-    START_X_POS: 50,
+    START_X_POS: 32,
     WIDTH: 44,
     WIDTH_DUCK: 59
 };
@@ -141,6 +142,8 @@ Trex.prototype = {
             Runner.config.BOTTOM_PAD;
         this.yPos = this.groundYPos;
         this.minJumpHeight = this.groundYPos - this.config.MIN_JUMP_HEIGHT;
+        var hasIntro = typeof Runner !== 'undefined' && Runner.config && Runner.config.ENABLE_INTRO;
+        this.xPos = hasIntro ? 0 : this.config.START_X_POS;
 
         this.draw(0, 0);
         this.update(0, Trex.status.WAITING);
@@ -181,8 +184,12 @@ Trex.prototype = {
 
         // Game intro animation, T-rex moves in from the left.
         if (this.playingIntro && this.xPos < this.config.START_X_POS) {
-            this.xPos += Math.round((this.config.START_X_POS /
-                this.config.INTRO_DURATION) * deltaTime);
+            this.xPos += (this.config.START_X_POS /
+                this.config.INTRO_DURATION) * deltaTime;
+            if (this.xPos >= this.config.START_X_POS) {
+                this.xPos = this.config.START_X_POS;
+                this.playingIntro = false;
+            }
         }
 
         if (this.status == Trex.status.WAITING) {
@@ -246,27 +253,30 @@ Trex.prototype = {
         sourceX += this.spritePos.x;
         sourceY += isAttack ? 0 : this.spritePos.y;
 
+        var drawX = Math.round(this.xPos);
+
         // Attack.
         if (isAttack) {
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                this.xPos, this.yPos - 2,
+                drawX, this.yPos - 2,
                 this.config.WIDTH, this.config.HEIGHT + 2);
         } else if (this.ducking && this.status != Trex.status.CRASHED) {
             // Ducking.
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                this.xPos, this.yPos,
+                drawX, this.yPos,
                 this.config.WIDTH_DUCK, this.config.HEIGHT);
         } else {
             // Crashed whilst ducking. Trex is standing up so needs adjustment.
             if (this.ducking && this.status == Trex.status.CRASHED) {
                 this.xPos++;
+                drawX = Math.round(this.xPos);
             }
             // Standing / running
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                this.xPos, this.yPos,
+                drawX, this.yPos,
                 this.config.WIDTH, this.config.HEIGHT);
         }
     },

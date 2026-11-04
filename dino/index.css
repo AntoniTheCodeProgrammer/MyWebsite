@@ -1,165 +1,179 @@
-/* Copyright 2013 The Chromium Authors. All rights reserved.
- * Use of this source code is governed by a BSD-style license that can be
- * found in the LICENSE file. */
+/* ==========================================================================
+   DINO BUT BETTER - RETRO ASCII TERMINAL (CHROME DINO COLOR PALETTE)
+   Kolory dostosowane bezpośrednio do gry (paleta Chrome Dino & Dark Theme):
+   - Tło: #202124 (oficjalne ciemne tło Chrome / Dark Mode)
+   - Kolor Dino (sprite): #535353 (ramki, obramowania)
+   - Tekst jasny / Tytuł: #f1f3f4 / #e8eaed (kolor odwróconych pikseli Dino)
+   - Tekst pomocniczy: #9aa0a6 (szarość interfejsu Chrome)
+   - Akcent ataku: #ea4335 (czerwień ataku / ognia)
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
 
 html, body {
-  padding: 0;
   margin: 0;
-  width: 100%;
-  height: 100%;
+  padding: 0;
+  background-color: #202124;
+  color: #f1f3f4;
+  font-family: 'Courier New', Courier, 'Lucida Console', Monaco, monospace;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.icon {
-  -webkit-user-select: none;
-  user-select: none;
-  display: inline-block;
-}
-
-.icon-offline {
-  content: -webkit-image-set( url(assets/default_100_percent/100-error-offline.png) 1x, url(assets/default_200_percent/200-error-offline.png) 2x);
-  position: relative;
-}
-
-.hidden {
-  display: none;
-}
-
-
-/* Offline page */
-
-.offline .interstitial-wrapper {
-  color: #2b2b2b;
-  font-size: 1em;
-  line-height: 1.55;
-  margin: 0 auto;
-  max-width: 600px;
-  padding-top: 100px;
-  width: 100%;
-}
-
-.offline .runner-container {
-  height: 150px;
-  max-width: 600px;
-  overflow: hidden;
-  position: absolute;
-  top: 35px;
-  width: 44px;
-}
-
-.offline .runner-canvas {
-  height: 150px;
-  max-width: 600px;
-  opacity: 1;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  z-index: 2;
-}
-
-.offline .controller {
-  background: rgba(247, 247, 247, .1);
-  height: 100vh;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100vw;
-  z-index: 1;
-}
-
+/* Ukrycie niepotrzebnych ikon domyślnych Chrome */
+.icon,
+.hidden,
 #offline-resources {
-  display: none;
+  display: none !important;
 }
 
-@media (max-width: 420px) {
-  .suggested-left > #control-buttons, .suggested-right > #control-buttons {
-    float: none;
-  }
-  .snackbar {
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    border-radius: 0;
-  }
+/* Główny kontener */
+.terminal {
+  max-width: 680px;
+  margin: 20px auto;
+  padding: 16px;
+  background-color: #202124;
 }
 
-@media (max-height: 350px) {
-  h1 {
-    margin: 0 0 15px;
-  }
-  .icon-offline {
-    margin: 0 0 10px;
-  }
-  .interstitial-wrapper {
-    margin-top: 5%;
-  }
-  .nav-wrapper {
-    margin-top: 30px;
-  }
+/* Baner i grafika ASCII - dopasowana do jasnych pikseli Dino (#f1f3f4) */
+.ascii-art {
+  margin: 12px 0;
+  font-family: inherit;
+  font-size: clamp(7px, 1.8vw, 11px);
+  line-height: 1.15;
+  color: #f1f3f4;
+  overflow-x: auto;
+  white-space: pre;
+  text-align: center;
 }
 
-@media (min-width: 600px) and (max-width: 736px) and (orientation: landscape) {
-  .offline .interstitial-wrapper {
-    margin-left: 0;
-    margin-right: 0;
-  }
+/* Obramowanie ekranu gry w kolorystyce Chrome Dino */
+.game-frame {
+  margin: 14px 0;
+  border: 1px solid #535353;
+  background-color: #202124;
 }
 
-@media (min-width: 420px) and (max-width: 736px) and (min-height: 240px) and (max-height: 420px) and (orientation:landscape) {
-  .interstitial-wrapper {
-    margin-bottom: 100px;
-  }
+.game-frame-header {
+  background-color: #292a2d;
+  color: #9aa0a6;
+  padding: 6px 10px;
+  font-size: 11px;
+  border-bottom: 1px solid #535353;
+  letter-spacing: 0.5px;
 }
 
-@media (min-height: 240px) and (orientation: landscape) {
-  .offline .interstitial-wrapper {
-    margin-bottom: 90px;
-  }
-  .icon-offline {
-    margin-bottom: 20px;
-  }
+.game-frame-footer {
+  background-color: #292a2d;
+  color: #9aa0a6;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-top: 1px solid #535353;
 }
 
-@media (max-height: 320px) and (orientation: landscape) {
-  .icon-offline {
-    margin-bottom: 0;
-  }
-  .offline .runner-container {
-    top: 10px;
-  }
-}
-
-@media (max-width: 240px) {
-  .interstitial-wrapper {
-    overflow: inherit;
-    padding: 0 8px;
-  }
-}
-
-.arcade-mode,
-.arcade-mode .runner-container,
-.arcade-mode .runner-canvas {
-  image-rendering: pixelated;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.arcade-mode #buttons,
-.arcade-mode #main-content {
-  opacity: 0;
-  overflow: hidden;
-}
-
+/* Wymiary kontenera gry - kluczowe dla canvasu Dino */
+.interstitial-wrapper,
 .arcade-mode .interstitial-wrapper {
-  height: 100vh;
-  max-width: 100%;
+  max-width: 600px !important;
+  height: 150px !important;
+  margin: 10px auto !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: transparent;
+}
+
+.offline .runner-container,
+.arcade-mode .runner-container {
+  height: 150px;
+  max-width: 600px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   overflow: hidden;
 }
 
-.arcade-mode .runner-container {
+/* Płótno gry (Canvas) - inwersja sprite'ów #535353 na jasne piksele #acacac */
+.runner-canvas {
+  height: 150px;
+  max-width: 600px;
+  position: absolute;
+  top: 0;
   left: 0;
-  margin: auto;
-  right: 0;
-  transform-origin: top center;
-  transition: transform 250ms cubic-bezier(0.4, 0, 1, 1) 400ms;
-  z-index: 2;
+  image-rendering: pixelated;
+  filter: invert(1);
+}
+
+.inverted .runner-canvas {
+  filter: none;
+}
+
+/* Przyciski dotykowe (mobilne) w stylistyce retro klawiszy */
+.touch-bar {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.ascii-btn {
+  flex: 1;
+  background: #292a2d;
+  color: #e8eaed;
+  border: 1px solid #535353;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px 4px;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.ascii-btn:hover,
+.ascii-btn:active {
+  background-color: #535353;
+  color: #ffffff;
+}
+
+/* Przycisk ataku z czerwonym akcentem */
+.ascii-btn-attack {
+  border-color: #ea4335;
+  color: #ea4335;
+}
+
+.ascii-btn-attack:hover,
+.ascii-btn-attack:active {
+  background-color: #ea4335;
+  color: #ffffff;
+  border-color: #ea4335;
+}
+
+/* Ramka ze sterowaniem w stylu ASCII */
+.ascii-box {
+  margin: 12px 0;
+  font-family: inherit;
+  font-size: clamp(8px, 1.9vw, 12px);
+  line-height: 1.25;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.controls-box {
+  color: #bdc1c6;
+  background-color: #292a2d;
+  padding: 10px;
+  border: 1px dashed #535353;
+}
+
+/* Responsywność dla małych ekranów */
+@media (max-width: 600px) {
+  .terminal {
+    margin: 6px;
+    padding: 10px;
+  }
 }
