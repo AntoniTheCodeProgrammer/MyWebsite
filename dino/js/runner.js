@@ -41,6 +41,15 @@ function Runner(outerContainerId, opt_config) {
     this.skillManager = null;
 
     this.highestScore = 0;
+    try {
+        var storedHighScore = window.localStorage.getItem('dino-high-score');
+        if (storedHighScore !== null && Number.isFinite(Number(storedHighScore)) &&
+            Number(storedHighScore) >= 0) {
+            this.highestScore = Number(storedHighScore);
+        }
+    } catch (error) {
+        console.error('Unable to load the saved Dino high score.', error);
+    }
 
     this.time = 0;
     this.runningTime = 0;
@@ -162,16 +171,16 @@ Runner.spriteDefinition = {
         STAR: { x: 645, y: 2 }
     },
     HDPI: {
-        CACTUS_LARGE: { x: 652, y: 2 },
-        CACTUS_SMALL: { x: 446, y: 2 },
-        CLOUD: { x: 166, y: 2 },
-        HORIZON: { x: 2, y: 104 },
-        MOON: { x: 954, y: 2 },
-        PTERODACTYL: { x: 260, y: 2 },
-        RESTART: { x: 2, y: 2 },
-        TEXT_SPRITE: { x: 1294, y: 2 },
-        TREX: { x: 1678, y: 2 },
-        STAR: { x: 1276, y: 2 }
+        CACTUS_LARGE: { x: 664, y: 4 },
+        CACTUS_SMALL: { x: 456, y: 4 },
+        CLOUD: { x: 172, y: 4 },
+        HORIZON: { x: 4, y: 108 },
+        MOON: { x: 968, y: 4 },
+        PTERODACTYL: { x: 268, y: 4 },
+        RESTART: { x: 4, y: 4 },
+        TEXT_SPRITE: { x: 1310, y: 4 },
+        TREX: { x: 1698, y: 4 },
+        STAR: { x: 1290, y: 4 }
     }
 };
 
@@ -365,6 +374,7 @@ Runner.prototype = {
         // Distance meter
         this.distanceMeter = new DistanceMeter(this.canvas,
             this.spriteDef.TEXT_SPRITE, this.dimensions.WIDTH);
+        this.distanceMeter.setHighScore(this.highestScore);
 
         // Draw t-rex
         this.tRex = new Trex(this.canvas, this.spriteDef.TREX);
@@ -835,6 +845,12 @@ Runner.prototype = {
         if (this.distanceRan > this.highestScore) {
             this.highestScore = Math.ceil(this.distanceRan);
             this.distanceMeter.setHighScore(this.highestScore);
+            try {
+                window.localStorage.setItem('dino-high-score',
+                    String(this.highestScore));
+            } catch (error) {
+                console.error('Unable to save the Dino high score.', error);
+            }
         }
 
         // Reset the time clock.

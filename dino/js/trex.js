@@ -126,8 +126,8 @@ Trex.animFrames = {
         msPerFrame: 1000 / 8
     },
     ATTACK: {
-        frames: [385, 429],
-        msPerFrame: 1000 / 5
+        frames: [382, 426],
+        msPerFrame: 1000 / 6
     }
 };
 
@@ -236,11 +236,15 @@ Trex.prototype = {
      */
     draw: function (x, y) {
         var isAttack = this.status == Trex.status.ATTACK;
+        var isFrame2 = isAttack && (x === 427 || this.currentFrame === 1);
+        var currentWidth = isAttack ? (isFrame2 ? 46 : 44) : (this.ducking && this.status != Trex.status.CRASHED ?
+            this.config.WIDTH_DUCK : this.config.WIDTH);
+        var currentHeight = isAttack ? (this.config.HEIGHT + 2) : this.config.HEIGHT;
+
         var sourceX = x;
         var sourceY = isAttack ? 0 : y;
-        var sourceWidth = this.ducking && !isAttack && this.status != Trex.status.CRASHED ?
-            this.config.WIDTH_DUCK : this.config.WIDTH;
-        var sourceHeight = isAttack ? (this.config.HEIGHT + 2) : this.config.HEIGHT;
+        var sourceWidth = currentWidth;
+        var sourceHeight = currentHeight;
 
         if (IS_HIDPI) {
             sourceX *= 2;
@@ -254,18 +258,19 @@ Trex.prototype = {
         sourceY += isAttack ? 0 : this.spritePos.y;
 
         var drawX = Math.round(this.xPos);
+        var drawY = isAttack ? (this.yPos - 2) : this.yPos;
 
         // Attack.
         if (isAttack) {
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                drawX, this.yPos - 2,
-                this.config.WIDTH, this.config.HEIGHT + 2);
+                drawX, drawY,
+                currentWidth, currentHeight);
         } else if (this.ducking && this.status != Trex.status.CRASHED) {
             // Ducking.
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                drawX, this.yPos,
+                drawX, drawY,
                 this.config.WIDTH_DUCK, this.config.HEIGHT);
         } else {
             // Crashed whilst ducking. Trex is standing up so needs adjustment.
@@ -276,7 +281,7 @@ Trex.prototype = {
             // Standing / running
             this.canvasCtx.drawImage(Runner.imageSprite, sourceX, sourceY,
                 sourceWidth, sourceHeight,
-                drawX, this.yPos,
+                drawX, drawY,
                 this.config.WIDTH, this.config.HEIGHT);
         }
     },

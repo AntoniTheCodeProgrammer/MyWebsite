@@ -268,7 +268,7 @@ function HorizonLine(canvas, spritePos) {
     this.sourceDimensions = {};
     this.dimensions = HorizonLine.dimensions;
     this.sourceXPos = [this.spritePos.x, this.spritePos.x +
-        this.dimensions.WIDTH];
+        (IS_HIDPI ? this.dimensions.WIDTH * 2 : this.dimensions.WIDTH)];
     this.xPos = [];
     this.yPos = 0;
     this.bumpThreshold = 0.5;
@@ -316,7 +316,8 @@ HorizonLine.prototype = {
      * Return the crop x position of a type.
      */
     getRandomType: function () {
-        return Math.random() > this.bumpThreshold ? this.dimensions.WIDTH : 0;
+        var width = IS_HIDPI ? this.dimensions.WIDTH * 2 : this.dimensions.WIDTH;
+        return Math.random() > this.bumpThreshold ? width : 0;
     },
 
     /**
