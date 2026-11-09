@@ -31,7 +31,7 @@
 
         <!-- Ekran gry z obramowaniem ASCII -->
         <div class="game-frame">
-            <div class="game-frame-header">+--[ EKRAN GRY: DISPLAY /dev/dino0 (600x150) ]--------------------+</div>
+            <div class="game-frame-header">+--[ GAME SCREEN: DISPLAY /dev/dino0 (600x150) ]--------------------+</div>
             
             <div id="main-frame-error" class="interstitial-wrapper">
                 <div id="main-content">
@@ -53,9 +53,17 @@
 
         <!-- Przyciski dotykowe (mobilne) w stylu ASCII CLI -->
         <div class="touch-bar">
-            <button type="button" class="ascii-btn" id="btn-jump">[ ^ SKOK ]</button>
-            <button type="button" class="ascii-btn" id="btn-duck">[ v KUCANIE ]</button>
-            <button type="button" class="ascii-btn ascii-btn-attack" id="btn-attack">[ * ATAK (Z) ]</button>
+            <button type="button" class="ascii-btn" id="btn-jump">[ ^ JUMP ]</button>
+            <button type="button" class="ascii-btn" id="btn-duck">[ v DUCK ]</button>
+            <button type="button" class="ascii-btn ascii-btn-attack" id="btn-attack">[ * ATACK (Z) ]</button>
+        </div>
+
+        <div class="command-terminal">
+            <div id="command-history" class="command-history" role="log" aria-live="polite"></div>
+            <label class="command-line">
+                <span class="command-prompt" aria-hidden="true">~/antonizmujdzin.pl/dino %</span>
+                <input id="command-input" type="text" aria-label="Polecenie terminala" autocomplete="off" spellcheck="false">
+            </label>
         </div>
 
         <!-- Ramka sterowania w czystym ASCII -->
@@ -104,6 +112,7 @@
             bindBtn('btn-attack', 'KeyZ', 90, 'z');
         })();
     </script>
+    <script src="js/terminal.js"></script>
 </body>
 
 </html>

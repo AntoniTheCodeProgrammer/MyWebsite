@@ -106,6 +106,7 @@ html, body {
   left: 0;
   image-rendering: pixelated;
   filter: invert(1);
+  transition: filter 0.5s ease;
 }
 
 .inverted .runner-canvas {
@@ -170,10 +171,105 @@ html, body {
   border: 1px dashed #535353;
 }
 
+.command-terminal {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+  height: 360px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  font-family: inherit;
+  font-size: 15px;
+  scrollbar-color: #535353 transparent;
+  scrollbar-width: thin;
+}
+
+.command-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 2px 16px;
+  color: #9aa0a6;
+  font-family: inherit;
+}
+
+.command-line:focus-within {
+  color: #f1f3f4;
+}
+
+.command-history {
+  display: flex;
+  flex-direction: column;
+}
+
+.command-entry,
+.command-output {
+  margin: 0;
+  padding: 2px 16px;
+  color: #f1f3f4;
+  font: inherit;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.command-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.command-entry .command-prompt {
+  color: #9aa0a6;
+}
+
+.command-output {
+  padding-left: 16px;
+  color: #bdc1c6;
+}
+
+.command-prompt {
+  flex: 0 0 auto;
+  color: #9aa0a6;
+  white-space: nowrap;
+}
+
+.command-line input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f1f3f4;
+  font: inherit;
+  caret-color: #f1f3f4;
+}
+
 /* Responsywność dla małych ekranów */
 @media (max-width: 600px) {
   .terminal {
     margin: 6px;
     padding: 10px;
+  }
+
+  .command-line {
+    gap: 8px;
+    padding: 2px 10px;
+  }
+
+  .command-terminal {
+    font-size: 12px;
+  }
+
+  .command-entry {
+    gap: 8px;
+  }
+
+  .command-entry,
+  .command-output {
+    padding-right: 10px;
+    padding-left: 10px;
   }
 }
