@@ -2,7 +2,7 @@
 
 /**
  * Projectile class.
- * Procedural square shot from Dino's head.
+ * Sprite-based shot from Dino's head.
  * @param {number} x
  * @param {number} y
  * @param {number} opt_speed
@@ -19,10 +19,14 @@ function Projectile(x, y, opt_speed, opt_size) {
 
 Projectile.config = {
     SIZE: 8,
-    SPEED: 12,
-    COLOR: '#535353',
-    INVERTED_COLOR: '#f7f7f7'
+    SPEED: 12
 };
+
+Projectile.image = new Image();
+Projectile.image.addEventListener('error', function () {
+    console.error('Unable to load the projectile sprite.');
+});
+Projectile.image.src = 'assets/default_100_percent/projectile.png';
 
 Projectile.prototype = {
     /**
@@ -38,15 +42,15 @@ Projectile.prototype = {
     },
 
     /**
-     * Draw the procedural square on canvas.
+     * Draw the projectile sprite on canvas.
      * @param {CanvasRenderingContext2D} canvasCtx
-     * @param {boolean} inverted
      */
-    draw: function (canvasCtx, inverted) {
-        canvasCtx.save();
-        canvasCtx.fillStyle = inverted ? Projectile.config.INVERTED_COLOR : Projectile.config.COLOR;
-        canvasCtx.fillRect(Math.round(this.x), Math.round(this.y), this.size, this.size);
-        canvasCtx.restore();
+    draw: function (canvasCtx) {
+        if (Projectile.image.complete && Projectile.image.naturalWidth) {
+            canvasCtx.drawImage(Projectile.image,
+                Math.round(this.x), Math.round(this.y),
+                this.size, this.size);
+        }
     },
 
     /**
@@ -150,13 +154,12 @@ SkillManager.prototype = {
     update: function (deltaTime) {
         var canvasCtx = this.runner.canvasCtx;
         var canvasWidth = this.runner.dimensions.WIDTH;
-        var inverted = this.runner.inverted;
         var obstacles = this.runner.horizon ? this.runner.horizon.obstacles : [];
 
         for (var i = this.projectiles.length - 1; i >= 0; i--) {
             var proj = this.projectiles[i];
             proj.update(deltaTime, canvasWidth);
-            proj.draw(canvasCtx, inverted);
+            proj.draw(canvasCtx);
 
             var projBox = proj.getCollisionBox();
             var hit = false;
@@ -195,4 +198,3 @@ SkillManager.prototype = {
         }
     }
 };
-

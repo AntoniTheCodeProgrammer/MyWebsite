@@ -382,6 +382,9 @@ Runner.prototype = {
         // Skills system
         this.skillManager = new SkillManager(this);
 
+        // Collectibles
+        this.meatManager = new MeatManager(this);
+
         this.outerContainerEl.appendChild(this.containerEl);
 
         // Ustawienie początkowej szerokości kontenera pod intro jeśli włączone
@@ -589,6 +592,9 @@ Runner.prototype = {
                 this.horizon.update(deltaTime, this.currentSpeed, hasObstacles,
                     this.inverted);
             }
+
+            this.meatManager.update(deltaTime, this.currentSpeed,
+                hasObstacles && !this.playingIntro);
 
             // Update skills and projectiles
             if (this.skillManager) {
@@ -895,6 +901,7 @@ Runner.prototype = {
             if (this.skillManager) {
                 this.skillManager.reset();
             }
+            this.meatManager.reset();
             this.playSound(this.soundFx.BUTTON_PRESS);
             this.invert(true);
             this.update();

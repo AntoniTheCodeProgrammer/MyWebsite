@@ -21,13 +21,15 @@
             case 'buy':
                 return 'Buying items is currently unavailable.';
             case 'inventory':
-                return 'Inventory is currently unavailable.';
+                return '┌----------┐\n| meat | ' + MeatInventory.get('meat') + ' |\n└----------┘';
             case 'select':
                 return 'Selecting items is currently unavailable.';
             case 'help':
                 return 'shop - Print available items in the shop\nbuy <item name or id> - Purchase items\ninventory - View your inventory\nselect <item name or id> - Select an item\nclear - Clear the terminal';
             case '67':
                 return '   ____ ______ \n  / ___|____  |\n | |___    / / \n |  _  |  / /  \n | |_| | / /   \n \\____/ /_/    \n \n     _^^^_   \n    ( o o )\n     ( ^ )\n     __|_\n    /  | \\ \n  \\_/  |  \\ \n       |  \\_/';
+            case '69':
+                return '   ____   ____  \n  / ___| / __ \\ \n | |___ | (_) | \n |  _  | \\__, | \n | |_| |   / /  \n \\____/   /_/   \n \n    O       \\   /\n  __|_       \\ / \n /  | \\       |  \n    |  \\      |   \n    |     \\   |  /\n   / \\     \\__|_/ \n  /   \\       O  ';
             case 'echo':
                 return argument;
             case 'date':
