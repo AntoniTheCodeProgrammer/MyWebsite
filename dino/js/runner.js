@@ -71,6 +71,7 @@ function Runner(outerContainerId, opt_config) {
     // Sound FX.
     this.audioBuffer = null;
     this.soundFx = {};
+    this.pendingStartSound = false;
 
     // Global web audio context for playing sounds.
     this.audioContext = null;
@@ -192,7 +193,9 @@ Runner.spriteDefinition = {
 Runner.sounds = {
     BUTTON_PRESS: 'offline-sound-press',
     HIT: 'offline-sound-hit',
-    SCORE: 'offline-sound-reached'
+    SCORE: 'offline-sound-reached',
+    MEAT: 'offline-sound-meat',
+    SHOT: 'offline-sound-shot'
 };
 
 
@@ -322,6 +325,10 @@ Runner.prototype = {
                 // Async, so no guarantee of order in array.
                 this.audioContext.decodeAudioData(buffer, function (index, audioData) {
                     this.soundFx[index] = audioData;
+                    if (index == 'BUTTON_PRESS' && this.pendingStartSound) {
+                        this.pendingStartSound = false;
+                        this.playSound(audioData);
+                    }
                 }.bind(this, sound));
             }
         }
@@ -541,6 +548,13 @@ Runner.prototype = {
         this.containerEl.style.left = '';
         this.containerEl.style.right = '';
         this.containerEl.style.margin = '';
+        if (!this.playCount) {
+            if (this.soundFx.BUTTON_PRESS) {
+                this.playSound(this.soundFx.BUTTON_PRESS);
+            } else {
+                this.pendingStartSound = true;
+            }
+        }
         this.playCount++;
 
         // Handle tabbing off the page. Pause the current game.
@@ -723,6 +737,7 @@ Runner.prototype = {
         if (e.target != this.detailsButton) {
             if (!this.crashed && (Runner.keycodes.JUMP[e.keyCode] ||
                 e.type == Runner.events.TOUCHSTART)) {
+                var isFirstStart = !this.playing && !this.paused;
                 if (!this.playing) {
                     this.loadSounds();
                     this.playing = true;
@@ -737,7 +752,9 @@ Runner.prototype = {
                 }
                 //  Play sound effect and jump on starting the game for the first time.
                 if (!this.tRex.jumping && !this.tRex.ducking) {
-                    this.playSound(this.soundFx.BUTTON_PRESS);
+                    if (!isFirstStart) {
+                        this.playSound(this.soundFx.BUTTON_PRESS);
+                    }
                     this.tRex.startJump(this.currentSpeed);
                 }
             }

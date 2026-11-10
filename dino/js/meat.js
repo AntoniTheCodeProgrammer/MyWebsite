@@ -84,6 +84,7 @@ MeatManager.prototype = {
 
             if (this.hasCollision()) {
                 MeatInventory.add('meat', 1);
+                this.runner.playSound(this.runner.soundFx.MEAT);
                 this.meat = null;
                 this.spawnTimer = this.getSpawnDelay();
             } else if (this.meat.xPos + MeatManager.config.WIDTH <= 0) {

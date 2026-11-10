@@ -107,6 +107,8 @@ SkillManager.prototype = {
         var tRex = this.runner.tRex;
         if (!tRex) return;
 
+        this.runner.playSound(this.runner.soundFx.SHOT);
+
         // Uruchomienie animacji ataku (2 klatki z końca spritesheetu)
         if (typeof tRex.startAttack === 'function') {
             tRex.startAttack();
